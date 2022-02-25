@@ -1,0 +1,13 @@
+FROM node
+
+RUN mkdir /src
+
+WORKDIR /src
+
+COPY package.json .
+
+RUN npm i
+
+COPY . .
+
+EXPOSE 3000

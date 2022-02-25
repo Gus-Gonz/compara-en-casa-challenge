@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql
+    container_name: db
+    environment:
+      MYSQL_DATABASE: 'app'
+      MYSQL_ROOT_PASSWORD: 'secret'
+    ports:
+      - '3306:3306'
+    stop_grace_period: 3s
+
+  backend:
+    build: ../backend/
+    command: >
+      sh -c " sleep 12
+              python manage.py migrate &&
+              python manage.py populate-db &&
+              python manage.py runserver 0.0.0.0:8000"
+    ports:
+      - "8000:8000"
+    env_file:
+      - "./env_files/.env_backend"
+    depends_on:
+      - db
+    tty: true
+    stop_grace_period: 3s
+  
+  frontend:
+    build: ../frontend/
+    ports:
+      - '3000:3000'
+    depends_on:
+      - backend
+    tty: true
+    command: npm start
+    stop_grace_period: 3s
+
+# volumes: 
